@@ -25,19 +25,33 @@
                     const chunkCount = ev.target.result.byteLength/CHUNK_SIZE;
                     console.log(ev.target.result)
                     console.log("Read successfully: chunk size " + chunkCount);
-                    const fileName = Math.random() * 1000 + theFile.name;
-                    for (let chunkId=0; chunkId < chunkCount+1; chunkId++){
+                    const fileName = theFile.name;
+                    let chunkId=0;
+                    //for (let chunkId=0; chunkId < chunkCount+1; chunkId++){
                         const chunk = ev.target.result.slice(chunkId * CHUNK_SIZE, (chunkId * CHUNK_SIZE) + CHUNK_SIZE);
-                        fetch ("/upload", {
+                        const myHeaders = new Headers();
+                        myHeaders.append("Content-Type", "application/json");
+
+                        //console.log(new Int8Array(chunk).toString())
+
+                        const raw = JSON.stringify({
+                            chunk : new Int8Array(chunk).toString(),
+                            fileName : fileName
+                        });
+                        console.log(raw)
+
+                        const requestOptions = {
                             method: "PUT",
-                            headers: {
-                                "content-length": chunk.length
-                            },
-                            body: JSON.stringify("fff")
-                        })
+                            headers: myHeaders,
+                            body: raw
+                        };
+
+                        fetch("/upload", requestOptions)
+                        .catch((error) => console.error(error));
+
                         wait.innerHTML = "Output: " + Math.round(chunkId * 100/Math.floor(chunkCount+1)) + "%"
 
-                    }
+                    //}
                 }
                 fileReader.readAsArrayBuffer(theFile); 
             })
