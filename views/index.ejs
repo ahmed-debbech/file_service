@@ -34,7 +34,7 @@
                         myHeaders.append("Content-Type", "application/json");
 
                         const raw = JSON.stringify({
-                            chunk : new Uint8Array(chunk).toString(),
+                            chunk : Array.from(new Uint8Array(chunk)),
                             fileName : fileName
                         });
                         console.log(raw)
@@ -45,7 +45,7 @@
                             body: raw
                         };
 
-                        fetch("/upload", requestOptions)
+                        await fetch("/upload", requestOptions)
                         .catch((error) => console.error(error));
 
                         wait.innerHTML = "Output: " + Math.round(chunkId * 100/Math.floor(chunkCount+1)) + "%"

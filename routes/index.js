@@ -8,9 +8,9 @@ router.get('/', function(req, res, next) {
 
 router.put('/upload', function(req, res, next) {
   console.log(req.body)  
-  if(req.body.chunk == '') {res.send('not good');  return;}
+  if(req.body.chunk.length == 0) {res.send('not good');  return;}
 
-  let uin = new Uint8Array(req.body.chunk.split(',').map(x => parseInt(x, 10)))
+  let uin = new Uint8Array(req.body.chunk)
 
   fs.appendFileSync(req.body.fileName, uin)
   res.send("good")
