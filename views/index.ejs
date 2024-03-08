@@ -26,16 +26,15 @@
                     console.log(ev.target.result)
                     console.log("Read successfully: chunk size " + chunkCount);
                     const fileName = theFile.name;
-                    let chunkId=0;
-                    //for (let chunkId=0; chunkId < chunkCount+1; chunkId++){
+
+                    for (let chunkId=0; chunkId < chunkCount+1; chunkId++){
+
                         const chunk = ev.target.result.slice(chunkId * CHUNK_SIZE, (chunkId * CHUNK_SIZE) + CHUNK_SIZE);
                         const myHeaders = new Headers();
                         myHeaders.append("Content-Type", "application/json");
 
-                        //console.log(new Int8Array(chunk).toString())
-
                         const raw = JSON.stringify({
-                            chunk : new Int8Array(chunk).toString(),
+                            chunk : new Uint8Array(chunk).toString(),
                             fileName : fileName
                         });
                         console.log(raw)
@@ -51,7 +50,7 @@
 
                         wait.innerHTML = "Output: " + Math.round(chunkId * 100/Math.floor(chunkCount+1)) + "%"
 
-                    //}
+                    }
                 }
                 fileReader.readAsArrayBuffer(theFile); 
             })

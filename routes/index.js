@@ -8,7 +8,11 @@ router.get('/', function(req, res, next) {
 
 router.put('/upload', function(req, res, next) {
   console.log(req.body)  
-  fs.appendFileSync(req.body.fileName, req.body.chunk.toString())
+  if(req.body.chunk == '') {res.send('not good');  return;}
+
+  let uin = new Uint8Array(req.body.chunk.split(',').map(x => parseInt(x, 10)))
+
+  fs.appendFileSync(req.body.fileName, uin)
   res.send("good")
 });
 
