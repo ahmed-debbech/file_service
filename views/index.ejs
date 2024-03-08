@@ -1,0 +1,46 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <h1>Welcome to file service!</h1>
+        <h3>upload file</h3>
+        File: <input type="file" id="f">
+        <button id="uploader">Upload!</button>
+        
+        <p id="wait">Output</p>
+
+        <script>
+            const btn = document.getElementById("uploader");
+            const f = document.getElementById("f")
+            const wait = document.getElementById("wait")
+
+            btn.addEventListener("click", () => {
+                console.log("started.")
+                const fileReader = new FileReader();
+                const theFile = f.files[0];
+                fileReader.onload = async ev => {
+
+                    const CHUNK_SIZE = 4096;
+                    const chunkCount = ev.target.result.byteLength/CHUNK_SIZE;
+                    console.log(ev.target.result)
+                    console.log("Read successfully: chunk size " + chunkCount);
+                    const fileName = Math.random() * 1000 + theFile.name;
+                    for (let chunkId=0; chunkId < chunkCount+1; chunkId++){
+                        const chunk = ev.target.result.slice(chunkId * CHUNK_SIZE, (chunkId * CHUNK_SIZE) + CHUNK_SIZE);
+                        fetch ("/upload", {
+                            method: "PUT",
+                            headers: {
+                                "content-length": chunk.length
+                            },
+                            body: JSON.stringify("fff")
+                        })
+                        wait.innerHTML = "Output: " + Math.round(chunkId * 100/Math.floor(chunkCount+1)) + "%"
+
+                    }
+                }
+                fileReader.readAsArrayBuffer(theFile); 
+            })
+        </script>
+    </body>
+</html>
