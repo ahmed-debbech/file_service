@@ -11,49 +11,19 @@
         <p id="wait">Output</p>
 
         <script>
-            const btn = document.getElementById("uploader");
-            const f = document.getElementById("f")
-            const wait = document.getElementById("wait")
-
-            btn.addEventListener("click", () => {
-                console.log("started.")
-                const fileReader = new FileReader();
-                const theFile = f.files[0];
-                fileReader.onload = async ev => {
-
-                    const CHUNK_SIZE = 4096;
-                    const chunkCount = ev.target.result.byteLength/CHUNK_SIZE;
-                    console.log(ev.target.result)
-                    console.log("Read successfully: chunk size " + chunkCount);
-                    const fileName = theFile.name;
-
-                    for (let chunkId=0; chunkId < chunkCount+1; chunkId++){
-
-                        const chunk = ev.target.result.slice(chunkId * CHUNK_SIZE, (chunkId * CHUNK_SIZE) + CHUNK_SIZE);
-                        const myHeaders = new Headers();
-                        myHeaders.append("Content-Type", "application/json");
-
-                        const raw = JSON.stringify({
-                            chunk : Array.from(new Uint8Array(chunk)),
-                            fileName : fileName
-                        });
-                        console.log(raw)
-
-                        const requestOptions = {
-                            method: "PUT",
-                            headers: myHeaders,
-                            body: raw
-                        };
-
-                        await fetch("/upload", requestOptions)
-                        .catch((error) => console.error(error));
-
-                        wait.innerHTML = "Output: " + Math.round(chunkId * 100/Math.floor(chunkCount+1)) + "%"
-
-                    }
-                }
-                fileReader.readAsArrayBuffer(theFile); 
+            const webSocket = new WebSocket('ws://localhost:3002/');
+            webSocket.onmessage = (event) => {
+                alert(Event)
+            };
+            webSocket.addEventListener("open", () => {
+                console.log("We are connected");
+            });
+            document.getElementById('uploader').addEventListener('click', () => {
+                webSocket.send('rrr')
             })
+
+
         </script>
+        
     </body>
 </html>
