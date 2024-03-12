@@ -4,8 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-const { WebSocketServer } = require('ws')
-const sockserver = new WebSocketServer({ server : })
+/*const { WebSocketServer } = require('ws')
+const sockserver = new WebSocketServer({ port : '/ws'})
 sockserver.on('connection', ws => {
   console.log('New client connected!')
   ws.send('connection established')
@@ -19,7 +19,9 @@ sockserver.on('connection', ws => {
   ws.onerror = function () {
     console.log('websocket error')
   }
-})
+})*/
+
+const ws = require('ws');
 
 var indexRouter = require('./routes/index');
 
@@ -48,6 +50,5 @@ app.use(function(err, req, res, next) {
   console.log(msg)
   res.send(msg)
 });
-
 
 module.exports = app;
