@@ -20,35 +20,42 @@
             btn.addEventListener("click", () => {
                 console.log("started.")
 
+                wait.innerHTML = "Output: "
+
                 const fileReader = new FileReader();
                 const theFile = f.files[0];
-                const webSocket = new WebSocket('ws://localhost:3001/ws?id=' + id);
-                webSocket.onopen = (ev) => {
-                    console.log("Connected in realtime... starting upload");
-                    fileReader.onload = async ev => {
-
-                        const CHUNK_SIZE = 4096;
-                        const chunkCount = ev.target.result.byteLength/CHUNK_SIZE;
-                        console.log("Read successfully: chunk size " + chunkCount);
-                        const fileName = theFile.name;
+                const CHUNK_SIZE = 4096;
+                let chunkCount = 0;
+                const fileName = theFile.name;
+                let buffer = null
+                fileReader.onload = async ev => {
+                    chunkCount = ev.target.result.byteLength/CHUNK_SIZE;
+                    console.log("chunk count is: " + chunkCount)
+                    buffer = ev.target.result;
+                    console.log("Read successfully: chunk size " + chunkCount);
+                    
+                    const webSocket = new WebSocket('ws://localhost:3001/ws?id=' + id);
+                    webSocket.onopen = (ev) => {
+                        console.log("Connected in realtime... starting upload");
                         
                         for (let chunkId=0; chunkId < chunkCount+1; chunkId++){
                             console.log("chunk number: " + chunkId)
-                            let chunk = ev.target.result.slice(chunkId * CHUNK_SIZE, (chunkId * CHUNK_SIZE) + CHUNK_SIZE);
+                            let chunk = buffer.slice(chunkId * CHUNK_SIZE, (chunkId * CHUNK_SIZE) + CHUNK_SIZE);
                             const raw = JSON.stringify({
                                 chunk : Array.from(new Uint8Array(chunk)),
                                 fileName : fileName
                             });
                             webSocket.send(raw)
-                            await new Promise(r => setTimeout(null, 1000));
                             wait.innerHTML = "Output: " + Math.round(chunkId * 100/Math.floor(chunkCount+1)) + "%"
                         }
-                    }
-                    fileReader.readAsArrayBuffer(theFile); 
+                        webSocket.onmessage = (event) => {
+                            console.log(event)
+                        };
+                        
+                    };
                 };
-                webSocket.onmessage = (event) => {
-                    console.log(event)
-                };
+                fileReader.readAsArrayBuffer(theFile); 
+
             })
         </script>
         
