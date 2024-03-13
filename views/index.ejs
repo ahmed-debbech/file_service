@@ -28,6 +28,7 @@
                 let chunkCount = 0;
                 const fileName = theFile.name;
                 let buffer = null
+                
                 fileReader.onload = async ev => {
                     chunkCount = ev.target.result.byteLength/CHUNK_SIZE;
                     console.log("chunk count is: " + chunkCount)
@@ -39,19 +40,27 @@
                         console.log("Connected in realtime... starting upload");
                         
                         let chunkId=0
-                        setInterval(()=>{
-                            wait.innerHTML = "Output: " + Math.round(chunkId * 100/Math.floor(chunkCount+1)) + "%"
-                        },1000)
-
-                        for (chunkId=0; chunkId < chunkCount+1; chunkId++){
-                            console.log("chunk number: " + chunkId)
-                            let chunk = buffer.slice(chunkId * CHUNK_SIZE, (chunkId * CHUNK_SIZE) + CHUNK_SIZE);
+                        const loop = (x) => {
+                            console.log("chunk number: " + x)
+                            let chunk = buffer.slice(x * CHUNK_SIZE, (x * CHUNK_SIZE) + CHUNK_SIZE);
                             const raw = JSON.stringify({
                                 chunk : Array.from(new Uint8Array(chunk)),
                                 fileName : fileName
                             });
                             webSocket.send(raw)
+                            wait.innerHTML = "Output: " + Math.round(x * 100/Math.floor(chunkCount+1)) + "%"
                         }
+                        let inter = setInterval(()=>{
+                            if(chunkId < chunkCount+1){
+                                loop(chunkId)
+                                //chunkId = chunkId +1;
+                                chunkId++
+                            }else{
+                                console.log("closing inter")
+                                clearInterval(inter);
+                            }
+                        },0)
+
                         webSocket.onmessage = (event) => {
                             console.log(event)
                         };

@@ -1,16 +1,24 @@
 const ws = require('ws');
+const fs = require('fs')
 
 let sockets = new Map()
 
 function implementation(key, message){
     if(!sockets.has(key)) return;
 
-    console.table(message.chunk)
-    if(message.chunk.length == 0) {return;}
+    let msg = JSON.parse(message)
 
-    let uin = new Uint8Array(message.chunk)
+    if(msg.chunk.length == 0) {
+        let so = sockets.get(key)
+        so.close()
+        sockets.delete(key)
+        console.log("socket " + key + "has been closed")
+        return;
+    }
 
-    fs.appendFileSync("downs/"+message.fileName, uin)
+    let uin = new Uint8Array(msg.chunk)
+
+    fs.appendFileSync("downs/"+msg.fileName, uin)
 }
 
 
@@ -35,7 +43,6 @@ function mountPoint(request, socket, head){
         });
         sockets.set(key, wsServer)
         console.log("socket "+key+" mounted!")
-        console.log(sockets)
     }else{
         console.log("unable to initiate socket")
     }
