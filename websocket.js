@@ -27,7 +27,7 @@ function mountPoint(request, socket, head){
         wsServer.on('connection', socket => {
             socket.on('message', message => {
                 let msg = message.toString()
-                //implementation(key, msg)
+                implementation(key, msg)
             });
         });
         wsServer.handleUpgrade(request, socket, head, function done(ws) {
