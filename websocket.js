@@ -1,5 +1,6 @@
 const ws = require('ws');
 const fs = require('fs')
+const db = require('./db');
 
 let sockets = new Map()
 
@@ -18,7 +19,8 @@ function implementation(key, message){
 
     let uin = new Uint8Array(msg.chunk)
 
-    fs.appendFileSync("downs/"+msg.fileName, uin)
+    //fs.appendFileSync("downs/"+msg.fileName, uin)
+    db.store(msg.fileName, uin);    
 }
 
 

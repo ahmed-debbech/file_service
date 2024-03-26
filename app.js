@@ -3,25 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
-/*const { WebSocketServer } = require('ws')
-const sockserver = new WebSocketServer({ port : '/ws'})
-sockserver.on('connection', ws => {
-  console.log('New client connected!')
-  ws.send('connection established')
-  ws.on('close', () => console.log('Client has disconnected!'))
-  ws.on('message', data => {
-    sockserver.clients.forEach(client => {
-      console.log(`distributing message: ${data}`)
-      client.send(`${data}`)
-    })
-  })
-  ws.onerror = function () {
-    console.log('websocket error')
-  }
-})*/
-
-const ws = require('ws');
+var db = require('./db')
 
 var indexRouter = require('./routes/index');
 
@@ -36,6 +18,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use((req, res, next) => {
+  if(db.fillCred() == null){
+    res.send("NO PATHS SET")
+  }
+})
+
 
 app.use('/', indexRouter);
 
