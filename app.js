@@ -22,6 +22,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
   if(db.fillCred() == null){
     res.send("NO PATHS SET")
+  }else{
+    next()
   }
 })
 

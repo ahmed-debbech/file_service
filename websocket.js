@@ -1,5 +1,4 @@
 const ws = require('ws');
-const fs = require('fs')
 const db = require('./db');
 
 let sockets = new Map()
@@ -9,7 +8,8 @@ function implementation(key, message){
 
     let msg = JSON.parse(message)
 
-    if(msg.chunk.length == 0) {
+    console.log(msg)
+    /*if(msg.chunk.length == 0) {
         let so = sockets.get(key)
         so.close()
         sockets.delete(key)
@@ -19,8 +19,7 @@ function implementation(key, message){
 
     let uin = new Uint8Array(msg.chunk)
 
-    //fs.appendFileSync("downs/"+msg.fileName, uin)
-    db.store(msg.fileName, uin);    
+    db.store(key, msg.fileName, uin);*/    
 }
 
 

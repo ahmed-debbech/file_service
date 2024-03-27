@@ -39,13 +39,22 @@
                     webSocket.onopen = (ev) => {
                         console.log("Connected in realtime... starting upload");
                         
+                        let c = JSON.stringify({
+                                fileName : fileName,
+                                type: "START"
+                            });
+
+                        webSocket.send(c)
+
                         let chunkId=0
                         const loop = (x) => {
                             console.log("chunk number: " + x)
                             let chunk = buffer.slice(x * CHUNK_SIZE, (x * CHUNK_SIZE) + CHUNK_SIZE);
-                            const raw = JSON.stringify({
+                            let raw = null;
+                            raw = JSON.stringify({
                                 chunk : Array.from(new Uint8Array(chunk)),
-                                fileName : fileName
+                                fileName : fileName,
+                                type: "DATA"
                             });
                             webSocket.send(raw)
                             wait.innerHTML = "Output: " + Math.round(x * 100/Math.floor(chunkCount+1)) + "%"
@@ -57,6 +66,12 @@
                                 chunkId++
                             }else{
                                 console.log("closing inter")
+                                let c = JSON.stringify({
+                                    fileName : fileName,
+                                    type: "FIN"
+                                });
+
+                                webSocket.send(c)
                                 clearInterval(inter);
                             }
                         },0)
