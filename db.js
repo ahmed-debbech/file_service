@@ -6,7 +6,9 @@ let db_path_meta = ""
 let seq=0;
 
 function store(socketid, file_meta, message){
-    currSeq()
+    let uin = new Uint8Array(message.chunk)
+
+    latestSeq()
     let newname = renameWithSeq(file_meta)
     fs.appendFileSync(db_path_data+"/"+newname, message)
     fs.writeFileSync(db_path_meta+"/"+newname+'.meta', file_meta)
@@ -38,7 +40,7 @@ function renameWithSeq(fileName){
     return g; 
 }
 
-function currSeq(){
+function latestSeq(){
     try {
         const data = fs.readFileSync('../paths', 'utf8');
         seq = data.split('\n')[3]

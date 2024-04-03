@@ -3,23 +3,21 @@ const db = require('./db');
 
 let sockets = new Map()
 
-function implementation(key, message){
-    if(!sockets.has(key)) return;
+function implementation(socket_key, message){
+    if(!sockets.has(socket_key)) return;
 
     let msg = JSON.parse(message)
 
     console.log(msg)
-    /*if(msg.chunk.length == 0) {
-        let so = sockets.get(key)
+    if(msg.type == "FIN") {
+        let so = sockets.get(socket_key)
         so.close()
-        sockets.delete(key)
-        console.log("socket " + key + "has been closed")
+        sockets.delete(socket_key)
+        console.log("socket " + socket_key + "has been closed")
         return;
     }
 
-    let uin = new Uint8Array(msg.chunk)
-
-    db.store(key, msg.fileName, uin);*/    
+    db.store(socket_key, msg);    
 }
 
 
@@ -42,7 +40,8 @@ function mountPoint(request, socket, head){
         wsServer.handleUpgrade(request, socket, head, function done(ws) {
             wsServer.emit('connection', ws, request);
         });
-        sockets.set(key, wsServer)
+        let obj = {websocket : wsServer}
+        sockets.set(key, obj)
         console.log("socket "+key+" mounted!")
     }else{
         console.log("unable to initiate socket")

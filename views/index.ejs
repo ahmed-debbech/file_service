@@ -35,7 +35,7 @@
                     buffer = ev.target.result;
                     console.log("Read successfully: chunk size " + chunkCount);
                     
-                    const webSocket = new WebSocket('ws://localhost:3001/ws?id=' + id);
+                    const webSocket = new WebSocket('ws://'+ location.host +'/ws?id=' + id);
                     webSocket.onopen = (ev) => {
                         console.log("Connected in realtime... starting upload");
                         
@@ -54,7 +54,8 @@
                             raw = JSON.stringify({
                                 chunk : Array.from(new Uint8Array(chunk)),
                                 fileName : fileName,
-                                type: "DATA"
+                                type: "DATA",
+                                chunkId: chunkId+1
                             });
                             webSocket.send(raw)
                             wait.innerHTML = "Output: " + Math.round(x * 100/Math.floor(chunkCount+1)) + "%"
